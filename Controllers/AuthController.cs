@@ -1,5 +1,6 @@
 ﻿using Fullstack.IdentityAPI.Models;
 using Fullstack.IdentityAPI.Models.DTOs;
+using Fullstack.IdentityAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,17 @@ namespace Fullstack.IdentityAPI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly JwtTokenService _jwtTokenService;
+
+
         public AuthController(
        UserManager<ApplicationUser> userManager,
-       SignInManager<ApplicationUser> signInManager,RoleManager<IdentityRole> roleManager)
+       SignInManager<ApplicationUser> signInManager,RoleManager<IdentityRole> roleManager, JwtTokenService jwtTokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _jwtTokenService = jwtTokenService;
         }
 
 
@@ -82,16 +87,16 @@ namespace Fullstack.IdentityAPI.Controllers
                 });
             }
 
-            //var result = await _signInManager.CheckPasswordSignInAsync(
-            //    user,
-            //    request.Password,
-            //    lockoutOnFailure: true);
+            var result = await _signInManager.CheckPasswordSignInAsync(
+                user,
+                request.Password,
+                lockoutOnFailure: true);
 
-            var result = await _signInManager.PasswordSignInAsync(
-        user,
-        request.Password,
-        isPersistent: false,
-        lockoutOnFailure: true);
+            //    var result = await _signInManager.PasswordSignInAsync(
+            //user,
+            //request.Password,
+            //isPersistent: false,
+            //lockoutOnFailure: true);
 
 
             if (!result.Succeeded)
@@ -102,16 +107,36 @@ namespace Fullstack.IdentityAPI.Controllers
                 });
             }
 
-            return Ok(new
+          //  var ( Token,ExpiresAtUtc) = await _jwtTokenService.CreateAccessTokenAsync(user);
+            var tokenResult =
+        await _jwtTokenService
+            .CreateAccessTokenAsync(user);
+
+
+
+
+
+
+            return Ok(new LoginResponse
             {
-                message = "Login successful.",
-                user = new UserResponse
+                AccessToken = tokenResult.Token,
+
+                TokenType = "Bearer",
+
+                ExpiresIn =
+            (int)(
+                tokenResult.ExpiresAtUtc
+                - DateTime.UtcNow)
+                .TotalSeconds,
+
+                User = new UserResponse
                 {
                     Id = user.Id,
                     FullName = user.FullName,
-                    Email = user.Email
+                    Email = user.Email!
                 }
             });
+
         }
 
         [HttpPost("roles/{roleName}")]

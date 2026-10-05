@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fullstack.IdentityAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     
@@ -25,7 +26,7 @@ namespace Fullstack.IdentityAPI.Controllers
             _roleManager = roleManager;
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("dashboard")]
         public IActionResult DashboardAdmin()
         {
