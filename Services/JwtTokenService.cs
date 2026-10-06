@@ -1,8 +1,10 @@
 ﻿using Fullstack.IdentityAPI.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Fullstack.IdentityAPI.Services
@@ -77,6 +79,28 @@ namespace Fullstack.IdentityAPI.Services
                     .WriteToken(token);
 
             return (accessToken, expiresAtUtc);
+        }
+
+
+        public string CreateRefreshToken()
+        {
+            var randomBytes =
+                RandomNumberGenerator.GetBytes(64);
+
+            return WebEncoders.Base64UrlEncode(
+                randomBytes);
+        }
+        public string HashRefreshToken(
+    string refreshToken)
+        {
+            var bytes =
+                Encoding.UTF8.GetBytes(
+                    refreshToken);
+
+            var hash =
+                SHA256.HashData(bytes);
+
+            return Convert.ToBase64String(hash);
         }
     }
 }

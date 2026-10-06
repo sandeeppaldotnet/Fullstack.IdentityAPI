@@ -26,7 +26,7 @@ namespace Fullstack.IdentityAPI.Controllers
             _roleManager = roleManager;
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("dashboard")]
         public IActionResult DashboardAdmin()
         {
@@ -39,7 +39,7 @@ namespace Fullstack.IdentityAPI.Controllers
         /// Get All Users
         /// </summary>
         /// <returns></returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Customer")]
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
