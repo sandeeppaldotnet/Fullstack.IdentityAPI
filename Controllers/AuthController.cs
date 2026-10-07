@@ -266,7 +266,13 @@ namespace Fullstack.IdentityAPI.Controllers
             }
 
 
-            if (storedToken.ExpiresAtUtc <= DateTime.UtcNow)
+            // Ensure we compare UTC times. DB DateTime kinds can be unspecified;
+            // treat the stored value as UTC when comparing to DateTime.UtcNow.
+            var storedExpiresUtc = DateTime.SpecifyKind(
+                storedToken.ExpiresAtUtc,
+                DateTimeKind.Utc);
+
+            if (storedExpiresUtc <= DateTime.UtcNow)
             {
                 return Unauthorized(new
                 {

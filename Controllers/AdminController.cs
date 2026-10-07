@@ -25,6 +25,15 @@ namespace Fullstack.IdentityAPI.Controllers
             _signInManager = signInManager;
             _roleManager = roleManager;
         }
+        [AllowAnonymous]
+        [HttpGet("DashboardAdminPublic")]
+        public IActionResult DashboardAdminPublic()
+        {
+            return Ok(new
+            {
+                message = "Welcome to the admin dashboard."
+            });
+        }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("dashboard")]
@@ -39,7 +48,7 @@ namespace Fullstack.IdentityAPI.Controllers
         /// Get All Users
         /// </summary>
         /// <returns></returns>
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer,Admin")]
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
@@ -88,6 +97,49 @@ namespace Fullstack.IdentityAPI.Controllers
             return Ok(new
             {
                 message = "Welcome to the Dashboard Customer ."
+            });
+        }
+
+        [HttpGet("myclaims")]
+        [Authorize]
+        public ActionResult GetMyClaims()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var emailID = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+            var roles = User.FindAll(System.Security.Claims.ClaimTypes.Role)
+                .Select(r => r.Value).ToList();
+
+            var department = User.FindFirst("Department")?.Value;
+
+            var userName = User.Identity?.Name;
+            return Ok(new
+            {
+                UserId = userId,
+                UserName = userName,
+                Email = emailID,
+                Roles = roles,
+                FullName = userName,
+                Department = department
+            });
+        }
+
+        [Authorize(Policy="AdminOnly")]
+        [HttpGet("Admin-Data")]
+        public IActionResult AdminData()
+        {
+            return Ok(new
+            {
+                message = "Welcome to the Dashboard Customer ."
+            });
+        }
+        [Authorize(Policy = "EmployeeManagment")]
+        [HttpGet("EmployeeManagment")]
+        public IActionResult EmployeeManagment()
+        {
+            return Ok(new
+            {
+                message = "Welcome to the EmployeeManagment ."
             });
         }
     }

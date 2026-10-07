@@ -114,7 +114,21 @@ builder.Services
                         jwtSettings.Key))
         };
     });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("Department", "Admin"));
+});
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("EmployeeManagment", policy =>
+    {
+        policy.RequireRole("Admin", "HR");
+        policy.RequireClaim("Department", "HR");
+    });
+        
+});
 
 var app = builder.Build();
 

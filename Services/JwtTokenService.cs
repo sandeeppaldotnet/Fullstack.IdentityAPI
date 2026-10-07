@@ -56,6 +56,11 @@ namespace Fullstack.IdentityAPI.Services
                     new Claim(ClaimTypes.Role, role));
             }
 
+            claims.Add(
+                new Claim(
+                    "Department",
+                    user.Department ?? string.Empty));
+
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_settings.Key));
 

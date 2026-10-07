@@ -9,5 +9,6 @@ namespace Fullstack.IdentityAPI.Models
         public string AdharNumber { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string Department { get; set; } = string.Empty;
     }
 }
